@@ -30,6 +30,8 @@ const punctuation = [
   "；",
   "、",
   "…",
+  ",",
+  ".",
 ];
 
 export default function Chapter() {
@@ -169,7 +171,7 @@ export default function Chapter() {
                         className={cn(
                           "select-none",
                           !punctuation.includes(word[0]) &&
-                            "border px-1 rounded",
+                            "border px-1 rounded shadow",
                           word === "" && "hidden"
                         )}
                       >
