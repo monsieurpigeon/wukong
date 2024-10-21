@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs";
+import { promises, readFile, writeFile } from "node:fs";
 const remove = [
   "\n",
   "。",
@@ -31,6 +31,7 @@ const remove = [
   "8",
   "9",
 ];
+
 function getFrequency() {
   readFile("public/full.txt", "utf8", (err, data) => {
     if (err) {
@@ -66,6 +67,42 @@ function getFrequency() {
   });
 }
 
+async function getWordFrequency() {
+  let result = {};
+  for (let i = 1; i <= 108; i++) {
+    let data = await promises.readFile(`public/words/${i}.txt`, "utf8");
+
+    const words = data.split("|");
+    result = words.reduce((acc, word) => {
+      const cleanWord = word
+        .split("")
+        .filter((char) => !remove.includes(char))
+        .join("");
+      if (!cleanWord) {
+        return acc;
+      }
+      if (!acc[cleanWord]) {
+        acc[cleanWord] = 0;
+      }
+      acc[cleanWord]++;
+      return acc;
+    }, result);
+    console.log(`chapter-${i} done`);
+  }
+  const list = Object.entries(result).sort((a, b) => b[1] - a[1]);
+  console.log(list);
+
+  const csv = list.map((item) => item.join(",")).join("\n");
+
+  writeFile(`public/word-stats.csv`, csv, (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.log("DONE");
+  });
+}
+
 function splitChapters() {
   readFile("public/full.txt", "utf8", (err, data) => {
     if (err) {
@@ -87,4 +124,4 @@ function splitChapters() {
   });
 }
 
-getFrequency();
+getWordFrequency();
